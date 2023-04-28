@@ -77,39 +77,64 @@ app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRe
 
 // Set up a home route with a login button
 // Set up a home route with login buttons for both Google and Facebook
+// Set up a home route with login buttons for both Google and Facebook
 app.get('/', (req, res) => {
     const user = req.user;
     const html = `
     <h1>Google and Facebook Login Demo</h1>
     ${user ? `
-      <table>
-        ${user.photos && user.photos.length > 0 ? `
+      ${user.provider === 'google' ? `
+        <table>
           <tr>
             <td>Profile Picture:</td>
             <td><img src="${user.photos[0].value}" alt="Profile Picture"/></td>
           </tr>
-        ` : ''}
-        <tr>
-          <td>Name:</td>
-          <td>${user.displayName}</td>
-        </tr>
-        <tr>
-          <td>Email:</td>
-          <td>${user.emails ? user.emails[0].value : ''}</td>
-        </tr>
-        ${user.birthday ? `
           <tr>
-            <td>Birthday:</td>
-            <td>${user.birthday}</td>
+            <td>Name:</td>
+            <td>${user.displayName}</td>
           </tr>
-        ` : ''}
-        ${user._json && user._json.addresses && user._json.addresses.length > 0 ? `
           <tr>
-            <td>Address:</td>
-            <td>${user._json.addresses[0].formattedValue}</td>
+            <td>Email:</td>
+            <td>${user.emails ? user.emails[0].value : ''}</td>
           </tr>
-        ` : ''}
-      </table>
+          ${user.birthday ? `
+            <tr>
+              <td>Birthday:</td>
+              <td>${user.birthday}</td>
+            </tr>
+          ` : ''}
+          ${user._json && user._json.addresses && user._json.addresses.length > 0 ? `
+            <tr>
+              <td>Address:</td>
+              <td>${user._json.addresses[0].formattedValue}</td>
+            </tr>
+          ` : ''}
+        </table>
+      ` : ''}
+      ${user.provider === 'facebook' ? `
+        <table>
+          ${user.photos && user.photos.length > 0 ? `
+            <tr>
+              <td>Profile Picture:</td>
+              <td><img src="${user.photos[0].value}" alt="Profile Picture"/></td>
+            </tr>
+          ` : ''}
+          <tr>
+            <td>Name:</td>
+            <td>${user.displayName}</td>
+          </tr>
+          ${user.emails && user.emails.length > 0 ? `
+            <tr>
+              <td>Email:</td>
+              <td>${user.emails[0].value}</td>
+            </tr>
+          ` : ''}
+          <tr>
+            <td>ID:</td>
+            <td>${user.id}</td>
+          </tr>
+        </table>
+      ` : ''}
       <a href="/logout">Log Out</a>
     ` : `
       <a href="/auth/google"><img src="https://developers.google.com/identity/images/btn_google_signin_dark_normal_web.png" alt="Sign in with Google"/></a>
